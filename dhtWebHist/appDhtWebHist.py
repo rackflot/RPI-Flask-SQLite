@@ -72,21 +72,20 @@ def index():
 
 @app.route('/', methods=['POST'])
 def my_form_post():
-    global numSamples 
-    numSamples = int (request.form['numSamples'])
-    numMaxSamples = maxRowsTable()
-    if (numSamples > numMaxSamples):
-        numSamples = (numMaxSamples-1)
-    
-    time, temp, hum = getLastData()
-    
-    templateData = {
+	global numSamples 
+	numSamples = int (request.form['numSamples'])
+	numMaxSamples = maxRowsTable()
+	if (numSamples > numMaxSamples):
+		numSamples = (numMaxSamples-1)
+
+	time, temp, hum = getLastData()
+	templateData = {
 	  'time'		: time,
       'temp'		: temp,
       'hum'			: hum,
       'numSamples'	: numSamples
 	}
-    return render_template('index.html', **templateData)
+	return render_template('index.html', **templateData)
 	
 	
 @app.route('/plot/temp')

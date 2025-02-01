@@ -6,18 +6,24 @@
 
 import time
 import sqlite3
-import Adafruit_DHT
+import adafruit_dht
+import board
 
 dbname='sensorsData.db'
 sampleFreq = 2 # time in seconds
+DHT22Sensor = ""
 
+def initDHT():
+	global DHT22Sensor
+	DHT22Sensor = adafruit_dht.DHT22(board.D4)
+	print("initializedDH22")
 
 # get data from DHT sensor
 def getDHTdata():	
-	
-	DHT22Sensor = Adafruit_DHT.DHT22
-	DHTpin = 16
-	hum, temp = Adafruit_DHT.read_retry(DHT22Sensor, DHTpin)
+	# DHTpin = 4
+	# hum, temp = Adafruit_DHT.read_retry(DHT22Sensor, DHTpin)
+	temp = DHT22Sensor.temperature
+	hum = DHT22Sensor.humidity 
 	
 	if hum is not None and temp is not None:
 		hum = round(hum)
@@ -45,6 +51,7 @@ def displayData():
 
 # main function
 def main():
+	initDHT()
 	for i in range (0,3):
 		getDHTdata()
 		time.sleep(sampleFreq)

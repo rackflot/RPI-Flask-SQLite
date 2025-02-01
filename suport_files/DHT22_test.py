@@ -6,7 +6,7 @@
 import Adafruit_DHT
 DHT22Sensor = Adafruit_DHT.DHT22
 
-DHTpin = 16
+DHTpin = 18
 
 humidity, temperature = Adafruit_DHT.read_retry(DHT22Sensor, DHTpin)
 

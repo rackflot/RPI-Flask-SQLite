@@ -19,4 +19,5 @@ with con:
     cur.execute("INSERT INTO DHT_data VALUES(datetime('now'), 25.8, 40)")
     cur.execute("INSERT INTO DHT_data VALUES(datetime('now'), 30.3, 50)")
 
-
+con.commit()
+con.close()

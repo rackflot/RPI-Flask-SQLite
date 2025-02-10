@@ -7,17 +7,18 @@
 #  
 # Insert dada on table "DHT_data" 
 
-import sqlite3 as lite
+import time
+import board
+import mariadb
 import sys
 
-con = lite.connect('sensorsData.db')
+sys.path.append('/home/pi/Adafruit_DHT')
+from DHT_DB import *
+from MF_Functions import *
 
-with con:
-    
-    cur = con.cursor() 
-    cur.execute("INSERT INTO DHT_data VALUES(datetime('now'), 20.5, 30)")
-    cur.execute("INSERT INTO DHT_data VALUES(datetime('now'), 25.8, 40)")
-    cur.execute("INSERT INTO DHT_data VALUES(datetime('now'), 30.3, 50)")
+dbh = iDHT_DB()
 
-con.commit()
-con.close()
+dbh.add_data (GetTimeStamp(), 20.5, 30, 1, 1)
+
+dbh.Commit()
+dbh.close()

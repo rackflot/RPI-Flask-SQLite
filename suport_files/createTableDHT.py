@@ -7,12 +7,14 @@
 #  
 # Create a table "DHT_data" to store DHT temp and hum data
 
-import sqlite3 as lite
+import mariadb
 import sys
+import board
 
-con = lite.connect('sensorsData.db')
+# we already have the database.
+# dbh = iDHT_DB()
 
-with con:
+with dbh:
     
     cur = con.cursor() 
     cur.execute("DROP TABLE IF EXISTS DHT_data")

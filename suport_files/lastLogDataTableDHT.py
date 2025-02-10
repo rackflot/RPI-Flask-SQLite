@@ -5,15 +5,20 @@
 #  
 # Query dada from last input on table "DHT_data" 
 
-import sqlite3
+import time
+import board
+import mariadb
+import sys
 
-conn=sqlite3.connect('sensorsData.db')
+sys.path.append('/home/pi/Adafruit_DHT')
+from DHT_DB import *
+from MF_Functions import *
 
-curs=conn.cursor()
+dbh = iDHT_DB()
 
-print ("\nLast raw Data logged on database:\n")
-for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
-    print (str(row[0])+" ==> Temp = "+str(row[1])+"	Hum ="+str(row[2]))
-
-
-
+# dbh.get_data()
+dbh.cursor.execute("SELECT * FROM actions ORDER BY time DESC LIMIT 1")
+dbh.conn.commit()
+data = dbh.cursor.fetchall()
+for row in data: #dbh.cursor.execute("SELECT * FROM actions"): # ORDER BY timestamp DESC LIMIT 1"):
+    print (row)

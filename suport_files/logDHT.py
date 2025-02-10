@@ -8,11 +8,14 @@
 #  Capture data from a DHT22 sensor and save it on a database
 
 import time
-import sqlite3
-import adafruit_dht
 import board
+import mariadb
+import sys
+sys.path.append('/home/pi/Adafruit_DHT')
+from DHT_DB import *
+from MF_Functions import *
 
-dbname='sensorsData.db'
+dbh = iDHT_DB()
 sampleFreq = 1 # time in seconds
 
 def initDHT():
@@ -47,13 +50,12 @@ def getDHTdata():
 
 # log sensor data on database
 def logData (temp, hum):
-	
-	conn=sqlite3.connect(dbname)
-	curs=conn.cursor()
+		
+	curs=dbh.cursor()
 	
 	curs.execute("INSERT INTO DHT_data values(datetime('now'), (?), (?))", (temp, hum))
-	conn.commit()
-	conn.close()
+	dbh.commit()
+	dbh.close()
 
 # display database data
 def displayData():

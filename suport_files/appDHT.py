@@ -9,7 +9,7 @@ import sqlite3
 import adafruit_dht
 import board
 
-dbname='sensorsData.db'
+dbname='sensorsData2.db'
 sampleFreq = 2 # time in seconds
 DHT22Sensor = ""
 

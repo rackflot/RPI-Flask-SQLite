@@ -11,6 +11,7 @@ import board
 import mariadb
 import sys
 
+# use the original files, add this dir.
 sys.path.append('/home/pi/Adafruit_DHT')
 from DHT_DB import *
 from MF_Functions import *

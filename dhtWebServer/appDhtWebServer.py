@@ -15,6 +15,7 @@ import mariadb
 import sys
 
 sys.path.append('/home/pi/Adafruit_DHT')
+sys.path.append('/home/pi/RPI_Flask_SQLite/dhtWebServer')
 from DHT_DB import *
 from MF_Functions import * 
 
@@ -22,6 +23,7 @@ dbh = iDHT_DB()
 
 from flask import Flask, render_template, request
 app = Flask(__name__)
+# app = Flask(appDhtWebServer)
 
 # Retrieve data from database
 def getData():
@@ -62,5 +64,5 @@ def index():
 
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', debug=False)
+	app.run(host='0.0.0.0', debug=True)
 

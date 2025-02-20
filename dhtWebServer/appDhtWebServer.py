@@ -9,13 +9,13 @@
 '''
 	RPi Web Server for DHT captured data  
 '''
-import time
-import board
-import mariadb
+# import time
+# import board
+# import mariadb
 import sys
 
 sys.path.append('/home/pi/Adafruit_DHT')
-sys.path.append('/home/pi/RPI_Flask_SQLite/dhtWebServer')
+sys.path.append('/home/pi/RPI_Flask_SQLite/dhtWebServer/')
 from DHT_DB import *
 from MF_Functions import * 
 
@@ -55,7 +55,7 @@ def index():
 	itime, itemp, ihumid = getData()
 	templateData = {
 	  'time'	: itime,
-      'temp'	: itemp,
+      'temp'	: itemp,	
       'humid'	: ihumid,
       'last'	: ilast
 	}
@@ -64,5 +64,5 @@ def index():
 
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', debug=True)
+	app.run(host='0.0.0.0', debug=False)
 

@@ -10,21 +10,31 @@
 	RPi WEb Server for DHT captured data with Graph plot  
 '''
 
+# Add in directory
+import sys
+sys.path.append('/home/pi/Adafruit_DHT')
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import io
-
 from flask import Flask, render_template, send_file, make_response, request
-app = Flask(__name__)
+from DHT_DB import *
+from MF_Functions import * 
 
+dbh = iDHT_DB()
+
+app = Flask(__name__)
+'''
 import sqlite3
 conn=sqlite3.connect('../sensorsData.db')
 curs=conn.cursor()
-
+'''
 # Retrieve LAST data from database
 def getLastData():
-	for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
+	statement = "SELECT * FROM actions ORDER BY itime DESC LIMIT 1"
+	dbh.cursor.execute(statement)
+	dbh.conn.commit()
+	for row in dbh.cursor: #  ("SELECT * FROM actions ORDER BY itime DESC LIMIT 1"):
 		time = str(row[0])
 		temp = row[1]
 		hum = row[2]
@@ -33,19 +43,25 @@ def getLastData():
 
 
 def getHistData (numSamples):
-	curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT "+str(numSamples))
-	data = curs.fetchall()
+	statement = "SELECT * FROM actions ORDER BY itime DESC LIMIT "+str(numSamples)
+	dbh.cursor.execute(statement)
+	dbh.conn.commit()
+	# curs.execute("SELECT * FROM actions ORDER BY timestamp DESC LIMIT "+str(numSamples))
+	# data = dbh.curs.fetchall()
 	dates = []
 	temps = []
 	hums = []
-	for row in reversed(data):
+	for row in dbh.cursor:
 		dates.append(row[0])
 		temps.append(row[1])
 		hums.append(row[2])
 	return dates, temps, hums
 
 def maxRowsTable():
-	for row in curs.execute("select COUNT(temp) from  DHT_data"):
+	statement = "select COUNT(itemp) from  actions"
+	dbh.cursor.execute(statement)
+	dbh.conn.commit() 
+	for row in dbh.cursor: #.execute("select COUNT(itemp) from actions"):
 		maxNumberRows=row[0]
 	return maxNumberRows
 
@@ -60,11 +76,11 @@ if (numSamples > 101):
 @app.route("/")
 def index():
 	
-	time, temp, hum = getLastData()
+	time, temp, humid = getLastData()
 	templateData = {
 	  'time'		: time,
       'temp'		: temp,
-      'hum'			: hum,
+      'hum'			: humid,
       'numSamples'	: numSamples
 	}
 	return render_template('index.html', **templateData)
@@ -125,5 +141,5 @@ def plot_hum():
 	return response
 
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=80, debug=False)
+   app.run(host='0.0.0.0', debug=False)
 

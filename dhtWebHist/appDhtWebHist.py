@@ -18,23 +18,34 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import io
 from flask import Flask, render_template, send_file, make_response, request
-from DHT_DB import *
-from MF_Functions import * 
 
-dbh = iDHT_DB()
+#from DHT_DB import *
+#from MF_Functions import * 
+
+# dbh = iDHT_DB()
 
 app = Flask(__name__)
-'''
+
 import sqlite3
-conn=sqlite3.connect('../sensorsData.db')
+conn=sqlite3.connect('/home/pi/RPI_Flask_SQLite/sensorsData.db', check_same_thread = False)
 curs=conn.cursor()
-'''
+curs.execute("SELECT * FROM DHT_data ORDER BY timestamp")
+data = curs.fetchall()
+dates = []
+temps = []
+hums = []
+for row in reversed(data):
+	dates.append(row[0])
+	temps.append(row[1])
+	hums.append(row[2])
+	print(str(row[0]) + " " + str(row[1]) + " " + str(row[2])) 
+
+
+
 # Retrieve LAST data from database
 def getLastData():
-	statement = "SELECT * FROM actions ORDER BY itime DESC LIMIT 1"
-	dbh.cursor.execute(statement)
-	dbh.conn.commit()
-	for row in dbh.cursor: #  ("SELECT * FROM actions ORDER BY itime DESC LIMIT 1"):
+	# dbh.cursor.execute("SELECT * FROM DHT_data ORDER BY itime DESC LIMIT 1")	# dbh.conn.commit()
+	for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
 		time = str(row[0])
 		temp = row[1]
 		hum = row[2]
@@ -43,25 +54,20 @@ def getLastData():
 
 
 def getHistData (numSamples):
-	statement = "SELECT * FROM actions ORDER BY itime DESC LIMIT "+str(numSamples)
-	dbh.cursor.execute(statement)
-	dbh.conn.commit()
-	# curs.execute("SELECT * FROM actions ORDER BY timestamp DESC LIMIT "+str(numSamples))
-	# data = dbh.curs.fetchall()
+	curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT "+str(numSamples))
+	data = curs.fetchall()
 	dates = []
 	temps = []
 	hums = []
-	for row in dbh.cursor:
+	#for row in dbh.cursor:
+	for row in reversed(data):
 		dates.append(row[0])
 		temps.append(row[1])
 		hums.append(row[2])
 	return dates, temps, hums
 
 def maxRowsTable():
-	statement = "select COUNT(itemp) from  actions"
-	dbh.cursor.execute(statement)
-	dbh.conn.commit() 
-	for row in dbh.cursor: #.execute("select COUNT(itemp) from actions"):
+	for row in curs.execute("select COUNT(temp) from  DHT_data"):
 		maxNumberRows=row[0]
 	return maxNumberRows
 
@@ -75,19 +81,20 @@ if (numSamples > 101):
 # main route 
 @app.route("/")
 def index():
-	
-	time, temp, humid = getLastData()
+	print("-*-*-*-*-* Index.html")
+	time, temp, hum = getLastData()
 	templateData = {
 	  'time'		: time,
       'temp'		: temp,
-      'hum'			: humid,
+      'hum'			: hum,
       'numSamples'	: numSamples
 	}
-	return render_template('index.html', **templateData)
+	return render_template('index_gage.html', **templateData)
 
 
 @app.route('/', methods=['POST'])
 def my_form_post():
+	print("-*-*-*-*-* POST")
 	global numSamples 
 	numSamples = int (request.form['numSamples'])
 	numMaxSamples = maxRowsTable()
@@ -101,11 +108,12 @@ def my_form_post():
       'hum'			: hum,
       'numSamples'	: numSamples
 	}
-	return render_template('index.html', **templateData)
+	return render_template('index_gage.html', **templateData)
 	
 	
 @app.route('/plot/temp')
 def plot_temp():
+	print("-*-*-*-*-* Plot Temp")
 	times, temps, hums = getHistData(numSamples)
 	ys = temps
 	fig = Figure()
@@ -124,6 +132,7 @@ def plot_temp():
 
 @app.route('/plot/hum')
 def plot_hum():
+	print("-*-*-*-*-* Plot Hum")
 	times, temps, hums = getHistData(numSamples)
 	ys = hums
 	fig = Figure()

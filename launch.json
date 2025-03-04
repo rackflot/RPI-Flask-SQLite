@@ -6,10 +6,25 @@
     "configurations": [
 
         {
-            "type": "node-terminal",
-            "name": "JavaScript Debug Terminal",
+            "name": "Python: Current File",
+            "type": "python",
             "request": "launch",
-            "cwd": "${workspaceFolder}"
+            //"stopOnEntry": true,
+            //"python": "/usr/bin/python",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            //"redirectOutput": true,
+            //"console": "externalTerminal",
+            //"preLaunchTask": "python",
+            "console": "internalConsole",
+            //"console": "integratedTerminal",
+            //"env": {},
+            //"envFile": "${workspaceFolder}/.env",
+            "sudo":true,
+            //"debugOptions": [
+            //    "RedirectOutput",
+            //    "Sudo"
+            //]
         }
     ]
 }

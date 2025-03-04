@@ -20,7 +20,7 @@ from flask import Flask, render_template, send_file, make_response, request
 app = Flask(__name__)
 
 import sqlite3
-conn=sqlite3.connect('../sensorsData.db')
+conn=sqlite3.connect('/home/pi/RPI_Flask_SQLite/sensorsData.db', check_same_thread = False)
 curs=conn.cursor()
 
 # Retrieve LAST data from database
@@ -70,12 +70,13 @@ def freqSample():
 	tstamp0 = datetime.strptime(times[0], fmt)
 	tstamp1 = datetime.strptime(times[1], fmt)
 	freq = tstamp1-tstamp0
-	freq = int(round(freq.total_seconds()/60))
+	#freq = freq.total_seconds()
+	#freq = int(round(freq.total_seconds()/60))
 	return (freq)
 
 # define and initialize global variables
 global numSamples
-numSamples = maxRowsTable()
+numSamples = int( round(maxRowsTable()))
 if (numSamples > 101):
         numSamples = 100
 
@@ -105,10 +106,11 @@ def my_form_post():
     global numSamples 
     global freqSamples
     global rangeTime
+    ifreqSamples = int(freqSamples.seconds)
     rangeTime = int (request.form['rangeTime'])
-    if (rangeTime < freqSamples):
-        rangeTime = freqSamples + 1
-    numSamples = rangeTime//freqSamples
+    if (rangeTime < ifreqSamples):
+        rangeTime = ifreqSamples + 1
+    numSamples = int(round(rangeTime/ifreqSamples))
     numMaxSamples = maxRowsTable()
     if (numSamples > numMaxSamples):
         numSamples = (numMaxSamples-1)
@@ -162,5 +164,5 @@ def plot_hum():
 	return response
 	
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=80, debug=False)
+   app.run(host='0.0.0.0', debug=False)
 

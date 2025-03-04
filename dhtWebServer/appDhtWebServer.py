@@ -16,47 +16,41 @@ import sys
 
 sys.path.append('/home/pi/Adafruit_DHT')
 sys.path.append('/home/pi/RPI_Flask_SQLite/dhtWebServer/')
-from DHT_DB import *
+# from DHT_DB import *
 from MF_Functions import * 
 
-dbh = iDHT_DB()
+# dbh = iDHT_DB()
 
 from flask import Flask, render_template, request
 app = Flask(__name__)
-# app = Flask(appDhtWebServer)
+
+import sqlite3
+conn=sqlite3.connect('/home/pi/RPI_Flask_SQLite/sensorsData.db', check_same_thread = False)
+curs=conn.cursor()
+
 
 # Retrieve data from database
 def getData():
-	"""
 	# conn=sqlite3.connect('../sensorsData.db')
 	# dbh.curs=dbh.cursor()
 
-	for row in dbh.curs.execute("SELECT * FROM Actions ORDER BY time DESC LIMIT 1"):
+	for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
 		time = str(row[0])
 		temp = row[1]
 		hum = row[2]
-	dbh.close()
-	"""
-	#statement = "SELECT itime, itemp, ihumid FROM actions" # ORDER BY itime DESC LIMIT 1"	
-	#statement = "SELECT itime, itemp, ihumid FROM actions ORDER BY itime DESC LIMIT 1"
-	statement = "SELECT * FROM actions order by itime DESC LIMIT 1"
-	#data = (itime, itemp, ihumid)
-	dbh.cursor.execute(statement) #, data)
-	dbh.conn.commit()
-	for row in dbh.cursor: #.fetchall():
-		print(row[0], row[1], row[2]) #, row[3], row[4]) #setp=' ')
+		print(str(row[0]) + " " + str(row[1]) + " " + str(row[2])) 
+	return time, temp, hum
 
-	return row[0], row[1], row[2]
 
 # main route 
 @app.route("/")
 def index():
 	ilast = GetTimeStamp()
-	itime, itemp, ihumid = getData()
+	time, temp, hum = getData()
 	templateData = {
-	  'time'	: itime,
-      'temp'	: itemp,	
-      'humid'	: ihumid,
+	  'time'	: time,
+      'temp'	: temp,	
+      'hum'		: hum,
       'last'	: ilast
 	}
 	#print(templateData)
